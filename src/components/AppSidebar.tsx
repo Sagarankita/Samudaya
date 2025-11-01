@@ -19,7 +19,6 @@ import {
   Bell,
   MessageSquare,
   User,
-  Settings,
   Users,
   LogOut,
 } from "lucide-react";
@@ -29,9 +28,10 @@ interface AppSidebarProps {
   currentPage: string;
   onPageChange: (page: string) => void;
   isAdmin?: boolean;
+  onLogout?: () => void;
 }
 
-export function AppSidebar({ currentPage, onPageChange, isAdmin = false }: AppSidebarProps) {
+export function AppSidebar({ currentPage, onPageChange, isAdmin = false, onLogout }: AppSidebarProps) {
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", value: "dashboard" },
     { icon: Calendar, label: "Calendar", value: "calendar" },
@@ -81,14 +81,17 @@ export function AppSidebar({ currentPage, onPageChange, isAdmin = false }: AppSi
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton className="hover:bg-destructive/10 hover:text-destructive">
-              <div className="flex items-center gap-3">
+            <SidebarMenuButton 
+              className="hover:bg-destructive/10 hover:text-destructive"
+              onClick={onLogout}
+            >
+              <div className="flex items-center gap-3 w-full">
                 <Avatar className="h-8 w-8">
                   <AvatarFallback className="bg-orange-600 text-white">RK</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <p>Rajesh Kumar</p>
-                  <p className="text-muted-foreground">rajesh@example.com</p>
+                  <p className="text-sm font-medium">Rajesh Kumar</p>
+                  <p className="text-xs text-muted-foreground">rajesh@example.com</p>
                 </div>
                 <LogOut className="h-4 w-4" />
               </div>

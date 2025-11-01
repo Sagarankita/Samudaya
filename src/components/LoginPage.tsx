@@ -5,9 +5,10 @@ import { Label } from "./ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader } from "./ui/card";
 import { Alert, AlertDescription } from "./ui/alert";
 import { Users, AlertCircle } from "lucide-react";
+import { authAPI } from "../services/api";
 
 interface LoginPageProps {
-  onLogin: () => void;
+  onLogin: (user: any) => void;
   onAdminLoginClick: () => void;
 }
 
@@ -15,11 +16,11 @@ export function LoginPage({ onLogin, onAdminLoginClick }: LoginPageProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Mock validation
     if (!email || !password) {
       setError("Please enter both email and password");
       return;
@@ -30,9 +31,22 @@ export function LoginPage({ onLogin, onAdminLoginClick }: LoginPageProps) {
       return;
     }
     
-    // Mock successful login
+    setLoading(true);
     setError("");
-    onLogin();
+
+    try {
+      const response = await authAPI.login(email, password);
+      
+      if (response.success) {
+        onLogin(response.user);
+      } else {
+        setError("Invalid credentials");
+      }
+    } catch (err: any) {
+      setError(err.message || "Login failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -74,6 +88,7 @@ export function LoginPage({ onLogin, onAdminLoginClick }: LoginPageProps) {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="bg-input-background"
+                    disabled={loading}
                   />
                 </div>
 
@@ -86,31 +101,29 @@ export function LoginPage({ onLogin, onAdminLoginClick }: LoginPageProps) {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="bg-input-background"
+                    disabled={loading}
                   />
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <a href="#" className="text-orange-600 hover:underline">
-                    Forgot password?
-                  </a>
+                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+                  <p className="text-emerald-800 text-sm">
+                    <strong>Demo User:</strong><br />
+                    Email: rajesh@example.com<br />
+                    Password: password123
+                  </p>
                 </div>
 
                 <Button 
                   type="submit" 
                   className="w-full bg-orange-600 hover:bg-orange-700"
+                  disabled={loading}
                 >
-                  Sign In
+                  {loading ? "Signing in..." : "Sign In"}
                 </Button>
               </div>
             </form>
           </CardContent>
           <CardFooter className="flex flex-col gap-3">
-            <p className="text-muted-foreground text-center">
-              Don't have an account?{" "}
-              <a href="#" className="text-orange-600 hover:underline">
-                Register here
-              </a>
-            </p>
             <div className="w-full border-t pt-3">
               <button
                 onClick={onAdminLoginClick}

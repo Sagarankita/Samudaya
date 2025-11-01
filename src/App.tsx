@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   SidebarProvider,
   SidebarInset,
@@ -22,15 +22,22 @@ export default function App() {
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [currentPage, setCurrentPage] = useState("dashboard");
 
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+    setIsAdmin(false);
+  };
+
+  const handleAdminLogin = () => {
+    setIsLoggedIn(true);
+    setIsAdmin(true);
+    setCurrentPage("admin");
+  };
+
   // Show admin login page
   if (!isLoggedIn && showAdminLogin) {
     return (
       <AdminLoginPage 
-        onLogin={() => {
-          setIsLoggedIn(true);
-          setIsAdmin(true);
-          setCurrentPage("admin");
-        }} 
+        onLogin={handleAdminLogin} 
         onBackToUserLogin={() => setShowAdminLogin(false)}
       />
     );
@@ -40,22 +47,17 @@ export default function App() {
   if (!isLoggedIn) {
     return (
       <LoginPage 
-        onLogin={() => {
-          setIsLoggedIn(true);
-          setIsAdmin(false);
-        }} 
+        onLogin={handleLogin} 
         onAdminLoginClick={() => setShowAdminLogin(true)}
       />
     );
   }
 
   const renderPage = () => {
-    // Admin users can only access admin panel
     if (isAdmin) {
       return <AdminPanel />;
     }
 
-    // Regular users access all other pages
     switch (currentPage) {
       case "dashboard":
         return <Dashboard onPageChange={setCurrentPage} />;
@@ -78,7 +80,7 @@ export default function App() {
     }
   };
 
-  // Admin view (no sidebar, just admin panel)
+  // Admin view
   if (isAdmin) {
     return (
       <div className="min-h-screen w-full bg-slate-50">
@@ -89,7 +91,7 @@ export default function App() {
     );
   }
 
-  // Regular user view (with sidebar)
+  // Regular user view
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
