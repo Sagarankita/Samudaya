@@ -153,42 +153,8 @@ export function Dashboard({ onPageChange, user }: DashboardProps) {
                 {...event} 
                 onRegister={async () => {
                   setSelectedEvent(event);
-                  if (event.status === "registered") {
-                    setShowEventDialog(true);
-                  } else {
-                    // Register for event
-                    try {
-                      await eventsAPI.register(event.id, user.id);
-                      // Refresh events
-                      const updatedEvents = await eventsAPI.getAll(user?.id);
-                      const published = updatedEvents.filter((e: any) => e.status === 'published').slice(0, 2);
-                      setUpcomingEvents(published.map((e: any) => ({
-                        id: e._id,
-                        title: e.title,
-                        date: e.date,
-                        time: e.time,
-                        location: e.location,
-                        category: e.category,
-                        capacity: e.capacity,
-                        registered: e.registered || 0,
-                        imageUrl: e.imageUrl || "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800",
-                        description: e.description,
-                        status: e.isRegistered ? "registered" as const : undefined,
-                      })));
-                      // Update selected event with new status
-                      const updated = updatedEvents.find((e: any) => e._id === event.id);
-                      if (updated) {
-                        setSelectedEvent({
-                          ...event,
-                          status: "registered" as const,
-                          registered: updated.registered || event.registered + 1,
-                        });
-                      }
-                      setShowEventDialog(true);
-                    } catch (err: any) {
-                      setError(err.message || "Registration failed");
-                    }
-                  }
+                  // On dashboard, only show details (no registration here)
+                  setShowEventDialog(true);
                 }}
               />
             ))}

@@ -28,6 +28,7 @@ export function EventCreation({ user }: EventCreationProps) {
   const [capacity, setCapacity] = useState("");
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -129,6 +130,7 @@ export function EventCreation({ user }: EventCreationProps) {
                         location,
                         category,
                         capacity: Number(capacity),
+                        imageUrl,
                         status: eventStatus,
                         tags: tags
                           .split(",")
@@ -146,7 +148,7 @@ export function EventCreation({ user }: EventCreationProps) {
                         location,
                         category,
                         capacity: Number(capacity),
-                        imageUrl: "",
+                        imageUrl,
                         creator: user.id,
                         status: eventStatus,
                         tags: tags
@@ -164,6 +166,7 @@ export function EventCreation({ user }: EventCreationProps) {
                     setCapacity("");
                     setDescription("");
                     setTags("");
+                    setImageUrl("");
                     setEditingEvent(null);
                     setEventStatus("draft");
                     if (editingEvent) {
@@ -286,11 +289,31 @@ export function EventCreation({ user }: EventCreationProps) {
                 <div className="space-y-2">
                   <Label htmlFor="image">Event Image</Label>
                   <div className="flex items-center gap-4">
-                    <Button type="button" variant="outline">
+                    <input
+                      id="image"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                          const result = reader.result as string;
+                          setImageUrl(result);
+                        };
+                        reader.readAsDataURL(file);
+                      }}
+                    />
+                    <Button type="button" variant="outline" onClick={() => {
+                      (document.getElementById("image") as HTMLInputElement)?.click();
+                    }}>
                       <Upload className="h-4 w-4 mr-2" />
                       Upload Image
                     </Button>
-                    <span className="text-muted-foreground">No file chosen</span>
+                    <span className="text-muted-foreground">
+                      {imageUrl ? "Image selected" : "No file chosen"}
+                    </span>
                   </div>
                 </div>
 

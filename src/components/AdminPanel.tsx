@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { useEffect, useState } from "react";
-import { adminAPI, usersAPI, forumAPI } from "../services/api";
+import { adminAPI, usersAPI, forumAPI, announcementsAPI } from "../services/api";
 import { Alert, AlertDescription } from "./ui/alert";
 
 interface AdminPanelProps { user: any }
@@ -32,6 +32,10 @@ export function AdminPanel({ user }: AdminPanelProps) {
   const [threads, setThreads] = useState<any[]>([]);
   const [stats, setStats] = useState<any>({ totalUsers: 0, activeEvents: 0, totalVolunteers: 0, forumPosts: 0 });
   const [error, setError] = useState("");
+  const [annTitle, setAnnTitle] = useState("");
+  const [annContent, setAnnContent] = useState("");
+  const [annMessage, setAnnMessage] = useState("");
+  const [annLoading, setAnnLoading] = useState(false);
 
   useEffect(() => {
     loadAdminData();
@@ -332,14 +336,51 @@ export function AdminPanel({ user }: AdminPanelProps) {
                     <div className="space-y-4 mt-4">
                       <div className="space-y-2">
                         <Label htmlFor="ann-title">Title</Label>
-                        <Input id="ann-title" className="bg-input-background" />
+                        <Input
+                          id="ann-title"
+                          className="bg-input-background"
+                          value={annTitle}
+                          onChange={(e) => setAnnTitle(e.target.value)}
+                        />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="ann-content">Content</Label>
-                        <Textarea id="ann-content" rows={5} className="bg-input-background" />
+                        <Textarea
+                          id="ann-content"
+                          rows={5}
+                          className="bg-input-background"
+                          value={annContent}
+                          onChange={(e) => setAnnContent(e.target.value)}
+                        />
                       </div>
-                      <Button className="w-full bg-emerald-600 hover:bg-emerald-700">
-                        Send to All Users
+                      {annMessage && (
+                        <p className="text-sm text-emerald-700">{annMessage}</p>
+                      )}
+                      <Button
+                        className="w-full bg-emerald-600 hover:bg-emerald-700"
+                        disabled={annLoading || !annTitle || !annContent}
+                        onClick={async () => {
+                          setError("");
+                          setAnnMessage("");
+                          try {
+                            setAnnLoading(true);
+                            await announcementsAPI.create({
+                              title: annTitle,
+                              content: annContent,
+                              type: "Info",
+                              author: user?.id,
+                            });
+                            setAnnMessage("Announcement sent successfully");
+                            setAnnTitle("");
+                            setAnnContent("");
+                          } catch (err: any) {
+                            setError(err.message || "Failed to send announcement");
+                          } finally {
+                            setAnnLoading(false);
+                          }
+                        }}
+                      >
+                        {annLoading ? "Sending..." : "Send to All Users"}
                       </Button>
                     </div>
                   </DialogContent>
