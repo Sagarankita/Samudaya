@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
   # Community Event Management UI
 
@@ -9,3 +10,7 @@
 
   Run `npm run dev` to start the development server.
   
+=======
+# Samudaya
+Community event management website
+>>>>>>> fc98ec380e3d98b9f8b76ebe4522250bfc75ec12
